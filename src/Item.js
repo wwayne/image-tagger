@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { saveAs } from 'file-saver';
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 
 import { STORAGE_KEY } from './constant'
 
@@ -67,23 +68,62 @@ export default function Item (props) {
     saveAs(blob, `${name}.txt`);
   }
 
+  const onDragEnd = (result) => {
+    const { source, destination } = result
+    const newMyTags = [...myTags]
+    const [removed] = newMyTags.splice(source.index, 1);
+    newMyTags.splice(destination.index, 0, removed);
+    setMyTags(newMyTags)
+  }
+
+  const getItemStyle = (isDragging, draggableStyle) => ({
+    background: isDragging ? "#eaf1ff" : "inheritant",
+    ...draggableStyle
+  });
+
   return (
     <div className='py-20'>
       <p className='mb-3 font-bold text-lg'>{name}</p>
       <div className='flex'>
         {imgSrc && <img src={imgSrc} className='w-96 h-96 objec-contain' alt='img' />}
-        <div className='ml-5 w-96 flex flex-col items-start'>
-          {myTags.map((tag, idx) => {
-            return (
-              <div className='flex w-full' key={idx}>
-                <input
-                  className="text-left flex-1"
-                  onChange={tagOnChange.bind(this, idx)}
-                  value={tag} />
-                <p className="font-bold w-5 text-red-400 cursor-pointer" onClick={removeItem.bind(this, idx)}>x</p>
-              </div>
-            ) 
-          })}
+        <div className='ml-5 w-96'>
+          <DragDropContext onDragEnd={onDragEnd}>
+            <Droppable droppableId="droppable">
+              {(provided, snapshot) => (
+                <div
+                  {...provided.droppableProps}
+                  ref={provided.innerRef}
+                  className="w-full  flex flex-col items-start">
+                  {
+                    myTags.map((tag, idx) => {
+                      return (
+                        <Draggable key={idx} draggableId={String(idx)} index={idx}>
+                          {(provided, snapshot) => (
+                            <div
+                              className='flex w-full p-1'
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                              style={getItemStyle(
+                                snapshot.isDragging,
+                                provided.draggableProps.style
+                              )}>
+                              <input
+                                className="text-left flex-1"
+                                onChange={tagOnChange.bind(this, idx)}
+                                value={tag} />
+                              <p className="font-bold w-5 text-red-400 cursor-pointer text-center" onClick={removeItem.bind(this, idx)}>x</p>
+                            </div>
+                          )}
+                        </Draggable>
+                      ) 
+                    })
+                  }
+                  {provided.placeholder}
+                </div>
+              )}
+            </Droppable>
+          </DragDropContext>
           <input
             className="px-2 py-1 rounded border mt-2 w-full"
             value={inputValue}

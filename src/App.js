@@ -4,8 +4,6 @@ import FileSelector from './FileSelector';
 import Item from './Item';
 import CommonTag from './CommonTag';
 
-import './App.css';
-
 function App() {
   const [items, setItems] = useState([])
 
