@@ -1,9 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { saveAs } from 'file-saver';
 
 import { STORAGE_KEY } from './constant'
-
-const COMMON_TAGS = ['illustration', 'drawing']
 
 export default function Item (props) {
   const { name, imageFile, tags = [] } = props.data
@@ -12,11 +10,13 @@ export default function Item (props) {
   const [myTags, setMyTags] = useState(tags)
   const [inputValue, setInputValue] = useState('');
 
+  const myTagsRef = useRef(myTags)
+
   useEffect(() => {
     let commonTagsFromStorage = localStorage.getItem(STORAGE_KEY)
     if (commonTagsFromStorage) {
       commonTagsFromStorage = JSON.parse(commonTagsFromStorage)
-      let newMyTags = [...myTags]
+      let newMyTags = [...myTagsRef.current]
       newMyTags = newMyTags.filter(tag => !commonTagsFromStorage.includes(tag))
       setMyTags(newMyTags)
     }
@@ -29,7 +29,7 @@ export default function Item (props) {
       setImgSrc(src)
     };
     reader.readAsDataURL(imageFile);
-  }, [])
+  }, [imageFile])
 
   const tagOnChange = (idx, e) => {
     const value = e.target.value
@@ -71,7 +71,7 @@ export default function Item (props) {
     <div className='py-20'>
       <p className='mb-3 font-bold text-lg'>{name}</p>
       <div className='flex'>
-        {imgSrc && <img src={imgSrc} className='w-96 h-96 objec-contain' />}
+        {imgSrc && <img src={imgSrc} className='w-96 h-96 objec-contain' alt='img' />}
         <div className='ml-5 w-96 flex flex-col items-start'>
           {myTags.map((tag, idx) => {
             return (
