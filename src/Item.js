@@ -1,6 +1,10 @@
 import { useState, useEffect } from 'react'
 import { saveAs } from 'file-saver';
 
+import { STORAGE_KEY } from './constant'
+
+const COMMON_TAGS = ['illustration', 'drawing']
+
 export default function Item (props) {
   const { name, imageFile, tags = [] } = props.data
   
@@ -9,18 +13,29 @@ export default function Item (props) {
   const [inputValue, setInputValue] = useState('');
 
   useEffect(() => {
+    let commonTagsFromStorage = localStorage.getItem(STORAGE_KEY)
+    if (commonTagsFromStorage) {
+      commonTagsFromStorage = JSON.parse(commonTagsFromStorage)
+      let newMyTags = [...myTags]
+      newMyTags = newMyTags.filter(tag => !commonTagsFromStorage.includes(tag))
+      setMyTags(newMyTags)
+    }
+  }, [])
+
+  useEffect(() => {
     const reader = new FileReader();
     reader.onload = (e) => {
       const src = e.target.result;
       setImgSrc(src)
     };
     reader.readAsDataURL(imageFile);
-  })
+  }, [])
 
   const tagOnChange = (idx, e) => {
-    const value = e.target.innerHTML.trim()
-    myTags[idx] = value
-    setMyTags(myTags)
+    const value = e.target.value
+    const newMyTags = [...myTags]
+    newMyTags[idx] = value
+    setMyTags(newMyTags)
   }
 
   const onKeyUp = (e) => {
@@ -35,8 +50,19 @@ export default function Item (props) {
     setInputValue(e.target.value)
   }
 
+  const removeItem = (idx) => {
+    const newMyTags = [...myTags]
+    newMyTags.splice(idx, 1)
+    setMyTags(newMyTags)
+  }
+
   const save = () => {
-    const tagString = myTags.join(', ')
+    let commonTagsFromStorage = localStorage.getItem(STORAGE_KEY)
+    if (commonTagsFromStorage) {
+      commonTagsFromStorage = JSON.parse(commonTagsFromStorage)
+    }
+    const commonTags = commonTagsFromStorage || []
+    const tagString = commonTags.concat(myTags).join(', ')
     const blob = new Blob([tagString], { type: 'text/plain;charset=utf-8' });
     saveAs(blob, `${name}.txt`);
   }
@@ -49,12 +75,13 @@ export default function Item (props) {
         <div className='ml-5 w-96 flex flex-col items-start'>
           {myTags.map((tag, idx) => {
             return (
-              <div
-                key={idx}
-                className="text-left"
-                contentEditable
-                onInput={tagOnChange.bind(this, idx)}
-                dangerouslySetInnerHTML={{ __html: tag }} />
+              <div className='flex w-full' key={idx}>
+                <input
+                  className="text-left flex-1"
+                  onChange={tagOnChange.bind(this, idx)}
+                  value={tag} />
+                <p className="font-bold w-5 text-red-400 cursor-pointer" onClick={removeItem.bind(this, idx)}>x</p>
+              </div>
             ) 
           })}
           <input

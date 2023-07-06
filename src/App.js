@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 import FileSelector from './FileSelector';
 import Item from './Item';
+import CommonTag from './CommonTag';
 
 import './App.css';
 
@@ -29,6 +30,7 @@ function App() {
   return (
     <div className="App flex flex-col items-center">
       <FileSelector onFilesSelected={onFilesSelected} />
+      <CommonTag />
       {items.map(item => {
         return <Item data={item} key={item.name} />
       })}
