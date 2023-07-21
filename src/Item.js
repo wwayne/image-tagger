@@ -85,7 +85,7 @@ export default function Item (props) {
     <div className='py-20'>
       <p className='mb-3 font-bold text-lg'>{name}</p>
       <div className='flex'>
-        {imgSrc && <img src={imgSrc} className='w-96 h-96 objec-contain' alt='img' />}
+        {imgSrc && <img src={imgSrc} className='w-96 h-96 object-contain' alt='img' />}
         <div className='ml-5 w-96'>
           <DragDropContext onDragEnd={onDragEnd}>
             <Droppable droppableId="droppable">
