@@ -18,15 +18,13 @@ export default function CommonTag () {
     const value = e.target.value
     const newTags = [...tags]
     newTags[idx] = value
-    saveTagsIntoStorage(newTags)
-    setTags(newTags)
+    saveNewTags(newTags)
   }
 
   const onKeyUp = (e) => {
     if (e.keyCode === 13) {
       const newTags = tags.concat([e.target.value])
-      setTags(newTags)
-      saveTagsIntoStorage(newTags)
+      saveNewTags(newTags)
       setInputValue("")
     }
   }
@@ -38,11 +36,16 @@ export default function CommonTag () {
   const removeItem = (idx) => {
     const newTags = [...tags]
     newTags.splice(idx, 1)
-    setTags(newTags)
+    saveNewTags(newTags)
   }
 
   const saveTagsIntoStorage = (tags) => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(tags))
+  }
+
+  const saveNewTags = (tags) => {
+    setTags(tags)
+    saveTagsIntoStorage(tags)
   }
 
   return (
