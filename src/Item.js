@@ -82,11 +82,11 @@ export default function Item (props) {
   });
 
   return (
-    <div className='py-20'>
+    <div className='py-20 w-screen px-20'>
       <p className='mb-3 font-bold text-lg'>{name}</p>
-      <div className='flex'>
-        {imgSrc && <img src={imgSrc} className='w-96 h-96 object-contain' alt='img' />}
-        <div className='ml-5 w-96'>
+      <div className='flex w-full'>
+        {imgSrc && <img src={imgSrc} className='w-3/5 object-contain' alt='img' />}
+        <div className='ml-5 w-2/5'>
           <DragDropContext onDragEnd={onDragEnd}>
             <Droppable droppableId="droppable">
               {(provided, snapshot) => (
